@@ -1161,16 +1161,18 @@ class Recursive(Pattern):
 		self.isDefined = False
 	def __ipow__(self, pattern):
 		''' Record real definition of the pattern.
-			~ just a syntactic trick to have recursivity '''
-		# record wrapped pattern
+			~ just a syntactic trick to cope with recursivity
+		'''
+		# Define common attributes, using wrapped pattern's format.
+		(expression, name)	= (pattern.format, self.name)
+		Pattern.__init__(self, expression, name)
+
+		# Record wrapped pattern.
 		self.pattern = pattern
 		self.pattern.name = '@%s@' % self.name
-		self.wrapped = [pattern]
-		# define common attributes
-		# -- using wrapped pattern's format
-		(expression,name)  = (pattern.format,self.name)
-		Pattern.__init__(self, expression, name)
-		# return self !!!
+		self.wrapped = [pattern]	# --> _resetMemo
+
+		# Return self !!!
 		self.isDefined = True
 		return self
 	def _realCheck(self, source, pos):
