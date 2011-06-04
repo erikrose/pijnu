@@ -322,6 +322,7 @@ class Pattern(object):
 		method = getattr(self, method_name)
 		# perform matches and assert
 		error_count = 0
+		pass_count = 0
 		for (source,result) in test_dict.items():
 			try:
 				r = method(source).value
@@ -331,15 +332,13 @@ class Pattern(object):
 				assert str(r) == result
 				if verbose:
 					print "%s --> %s" %(source, result)
+				pass_count += 1
 			except AssertionError:
 				error_count += 1
 				print (	"*** error ***\n   %s --> %s\n   expected: %s"
 						%(source, r, result) )
-		# error count summary
-		if error_count == 0:
-			print "\n*** test suite passed ***"
-		else:
-			print "\n*** %s errors found ***" % error_count
+		# print summary
+		print "\n*** Test suite: %s passed; %s failed ***" % (pass_count, error_count)
 		return error_count
 	def testSuiteDict(self, sources, method_name="parse"):
 		''' Return & print a test dict for testSuite.
