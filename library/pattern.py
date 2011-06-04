@@ -328,7 +328,7 @@ class Pattern(object):
 			except PijnuError:
 				r = None
 			try:
-				assert r == result
+				assert str(r) == result
 				if verbose:
 					print "%s --> %s" %(source, result)
 			except AssertionError:
