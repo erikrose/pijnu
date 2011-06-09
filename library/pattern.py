@@ -340,7 +340,43 @@ class Pattern(object):
 		# print summary
 		print "\n*** Test suite: %s passed; %s failed ***" % (pass_count, error_count)
 		return error_count
-	def testSuiteDict(self, sources, method_name="parse"):
+	def testSuiteMultiline(self, sources, results, method_name="parse", verbose=False):
+		''' Perform a test suite by asserting equality
+			of expected and actual parse results.
+			This method is rather intended to check that modifications
+			did not create bugs, after a program has once run fine.
+			~  test_dict holds {source:result} pairs
+			~ result is in fact the string repr of a node *value*
+			~ None result means expected failure.
+			Use testSuiteDict to first get a test_dict.
+			Note that unlike test, the default method is parse.
+			'''
+		assert len(sources) == len(results), "Bad length: %s sources for %s results!" % (len(sources), len(results))
+		# get proper match method
+		method = getattr(self, method_name)
+		# perform matches and assert
+		error_count = 0
+		pass_count = 0
+		for i in range(len(sources)):
+			source = sources[i]
+			result = results[i]
+			try:
+				r = method(source)
+			except PijnuError:
+				r = None
+			try:
+				assert r.treeView() == result
+				if verbose:
+					print "%r --> %r" %(source, result)
+				pass_count += 1
+			except AssertionError:
+				error_count += 1
+				print (	"*** error ***\n   %s --> \n*%s*\n\n   expected: \n*%s*\n"
+						%(source, r.treeView(), result) )
+		# print summary
+		print "\n*** Test suite: %s passed; %s failed ***" % (pass_count, error_count)
+		return error_count
+	def testSuiteDict(self, sources, method_name="parse", multiline = False):
 		''' Return & print a test dict for testSuite.
 			Note that this should be done only once!
 			Can also be used alone just to run and output
@@ -352,18 +388,32 @@ class Pattern(object):
 		d = OrDict()
 		for source in sources:
 			try:
-				result = method(source).value
+				result = method(source)
 			except PijnuError:
 				result = None
 			d[source] = result
 		# write dict out & return it
 		# ~ Both source & result are written in repr format,
 		#   so that reading back should yield correct objects.
-		print "test_suite_dict = {"
-		for (source,result) in d.items():
-			source_dot = "%r : " % source
-			print "%33s%r" % (source_dot,result)
-		print "    }"
+		if multiline:
+			i = 0
+			sources = []
+			results = []
+			for (source, result) in d.items():
+				print "source%s = \"\"\"%s\"\"\"" % (i, source)
+				if result is not None:
+					result = result.treeView()
+				print "result%s = \"\"\"%s\"\"\"" % (i, result)
+				sources.append("source%s" % i)
+				results.append("result%s" % i)
+				i += 1
+			print "sources = [", ', '.join(sources), "]"
+			print "results = [", ', '.join(results), "]"
+		else:
+			print "test_suite_dict = {"
+			for (source, result) in d.items():
+				print "    \"%s\": \"%r\"" % (source, result.value)
+			print "}"
 		return d
 	### match check
 	def _check(self, source, pos):
