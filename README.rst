@@ -18,6 +18,8 @@ The major difference is that PEG is a grammar to express string **recognition** 
 
 The parser is produced from the grammar by a generator which, indeed, itself "meta-uses" the library. For the story, all but the first generator were themselves "meta-produced" by previous versions of the generator: `pijnu` is *bootstrapped*.
 
+Example::
+
     ### simple arithmetics with '+' and '*' only
     formula
     <definition>
