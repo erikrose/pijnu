@@ -2,10 +2,13 @@
 
 `pijnu` was created in 2009 by Denis "Spir" Derman and then transferred to Peter Potrowl (peter17 on GitHub) in June 2011.
 
-# Presentation
+Presentation
+============
+
 *See the wiki pages for details.*
 
-## Syntax and grammar
+Syntax and grammar
+------------------
 
 `pijnu` syntax is a custom, extended version of Parsing Expression Grammars (PEG); which itself is a kind of mix of BNF and regular expressions.
 
@@ -31,7 +34,8 @@ The parser is produced from the grammar by a generator which, indeed, itself "me
     grup       : LPAREN (add / mult) RPAREN
     formula    : add / mult / number
 
-## Post-process & transformations
+Post-process & transformations
+------------------------------
 
 A parsing phase produces a parse tree in which every node was yielded by a pattern. Simple leaf nodes hold the matched string snippet while branch nodes contain a sequence of child nodes. A major issue in text processing applications is that a raw parse tree is far from having a form well suited for further processing.
 
@@ -41,7 +45,7 @@ Moreover, a user can write custom functions right inside the grammar that will t
 
 For instance, to compute the actual result from the above *formula* grammar, one needs only 2 single-line functions: one for each operation indeed. Then, the result of the parsing/processing process *is* the result of the expressed formula.
 
-Another example that will generate XHTML from wiki-text styled lines (possibly nested), using a single 3-lines function:
+Another example that will generate XHTML from wiki-text styled lines (possibly nested), using a single 3-lines function::
 
     ### parse wiki-text styled lines and rewrite them into XHTML
     wikInline
@@ -69,7 +73,8 @@ Another example that will generate XHTML from wiki-text styled lines (possibly n
 
 The column on right side assigns transformations to patterns. `drop`, `join`, and `liftValue` are builtin. `styledSpan` is a custom transformation. `'@'` denotes a recursive pattern.
 
-## Practical use
+Practical use
+-------------
 
 *See the guide & tutorial in the wiki for details.*
 
@@ -79,13 +84,13 @@ It provides highly informative feedback about patterns, results and exceptions.
 
 Custom extensions from PEG help defining legible grammars -- there may be more in the future. There are also pre-processing functions and configuration parameters that may be worthful in practical cases, but still need be fully integrated.
 
-Typically, a user will define the grammar, import the generator and let it write a corresponding parser. This parser comes in the form of a python module from which a parser object can be imported. The said parser object and each of its patterns can be used to match a source text partially or completely, find first or all occurrences of matches, or replace found matches. In most cases, transformation will restructure and further process the resulting parse tree.
+Typically, a user will define the grammar, import the generator and let it write a corresponding parser. This parser comes in the form of a python module from which a parser object can be imported. The said parser object and each of its patterns can be used to match a source text partially or completely, find first or all occurrences of matches, or replace found matches. In most cases, transformation will restructure and further process the resulting parse tree::
 
     from pijnu import generator
     generator.writeParser(myGrammar)
     from myGrammarParser import myGrammarParser
     myGrammarParser.match(source)
 
-It is also possible to directly produce a parser from the command line using the `gen.py` module (later may be renamed to `pijnu.py`):
+It is also possible to directly produce a parser from the command line using the `gen.py` module (later may be renamed to `pijnu.py`)::
 
     python gen.py myGrammar.pijnu myParser.py
