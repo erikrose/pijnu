@@ -1,22 +1,23 @@
 Metadata-Version: 1.0
 Name: pijnu
-Version: 20090619
+Version: 20110610
 Summary: text parsing & processing tool
-Home-page: http://spir.wikidot.com/pijnu
-Author: Denis Derman
-Author-email: denis.spir@free.fr
+Home-page: http://www.github.com/peter17/pijnu
+Author: Peter Potrowl
+Author-email: peter017@gmail.com
 License: GPL3
 Description: 'pijnu' is
         * a parsing language extended from PEG,
         * a parser generator for grammars written using this language,
-        * a tool for post-match processing parse results.
+        * a tool to help processing processing parse results.
         
-        'pijnu' is intended to be clear, easy, practicle.
+        'pijnu' is intended to be clear, easy, practical.
         
-Platform: unix-like
-Platform: more? needs tests
+Platform: Any
 Classifier: License :: GPL
 Classifier: Development Status :: 4 - Beta
 Classifier: Topic :: Software Development
+Classifier: Topic :: Text Processing
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
 Classifier: Intended Audience :: Developers
 Classifier: Programming Language :: Python
