@@ -21,6 +21,7 @@ along with PIJNU: see the file called 'GPL'.
 If not, see <http://www.gnu.org/licenses/>.
 '''
 
+
 from pijnu.generator import writeParser
 from pijnu.library.pattern import *
 

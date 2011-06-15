@@ -1,0 +1,201 @@
+# pijnu meta grammar -- stable work version
+
+# © 2009 Denis Derman (former developer) <denis.spir@gmail.com>
+# © 2011 Peter Potrowl (current developer) <peter017@gmail.com>
+
+# This file is part of PIJNU.
+
+# PIJNU is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# PIJNU is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with PIJNU: see the file called 'GPL'.
+# If not, see <http://www.gnu.org/licenses/>.
+
+# pijnu meta grammar
+pijnu
+<toolset>
+	from pijnuToolset import *
+<preprocess>
+	#
+<definition>
+	### tokens
+		## separators
+			# spacing
+			# SPACES is a token for Sequence and in transform column.
+			# OPTSPACE is for convenience inside formats.
+			# BLANK (includes tabs) is allowed outside formats only.
+			SPACE			: ' '
+			OPTSPACE		: SPACE								: drop
+			SPACES			: SPACE+
+			TAB				: '\x09'
+			BLANK			: (TAB / SPACE)*					: drop
+			INDENT			: BLANK
+			TRAIL			: BLANK
+			ALIGN			: BLANK
+			# columns
+			COLON			: ':'
+			COLUMN			: ALIGN COLON ALIGN					: drop
+			# end of line
+			LF				: '\x0a'
+			CR				: '\x0d'
+			NL				: (CR LF) / LF / CR
+			EOL				: TRAIL NL							: drop
+			# character coding
+			ESCAPE			: '\x5c'
+		## codes
+			# character expression for: char, word, ranj, klass
+			# (no need to drop codes as there will be transformation anyway)
+			CODEDCHAR		: ESCAPE
+			DECCHAR			: ESCAPE
+			HEXCHAR			: ESCAPE 'x'
+			EXCLUSION		: "!!"
+			RANJ			: ".."
+			KLASSSEP		: "  "								: drop
+			CHAR			: "\'"								: drop
+			WORD			: "\""								: drop
+			LCLAS			: "["								: drop
+			RCLAS			: "\]"								: drop
+			ANYCHAR			: "."
+			# term affix -- no spacing allowed
+			# (do not drop repetition suffix)
+			ZEROORMORE		: "+"
+			ONEORMORE		: "+"
+			LREPETE			: '{'								: drop
+			RREPETE			: '}'								: drop
+			NUMRANJ			: ".."								: drop
+			OPTION			: '?'								: drop
+			NEXT			: '&'								: drop
+			NEXTNOT			: '!'								: drop
+			# major pattern combination
+			LGROUP			: OPTSPACE "(" OPTSPACE				: drop
+			RGROUP			: OPTSPACE ")" OPTSPACE				: drop
+			CHOICE			: OPTSPACE "/" OPTSPACE				: drop
+			SEQUENCE		: SPACES							: drop
+			# structure
+			LHEADER			: "<"
+			RHEADER			: ">"
+			TRANSFORMSEP	: SPACES							: drop
+			RECURSIVE		: "@"
+			COMMENT			: "#"
+		## character classes
+			DECDIGIT		: [0..9]
+			HEXDIGIT		: [0..9  abcdef  ABCDEF]
+			IDSTART			: [a..z  A..Z  _]
+			IDSUITE			: [a..z  A..Z  0..9  _]
+			# ASCII only for now: 'black' chars + sp tab nl cr
+			VALIDCHAR		: [\x21..\x7e  \x20\x09\x0a\x0d]
+			# exclude backslash "'" '"' ']'
+			SAFECHAR		: [\x21..\x7e  \x20\x09\x0a\x0d  !!\x22\x27\x5c\x5d]
+			# chars to encode special & unsafe characters: t r n ' " backslash ]
+			CHARCODE		: [trn  \x22\x27\x5c\x5d]
+			# for comment and toolset: 'black' chars + sp + tab
+			INLINECHAR		: [\x21..\x7e  \x20\x09]
+		## character strings
+			INTEGER			: DECDIGIT+
+			IDENTIFIER		: IDSTART IDSUITE*							: join
+			INLINETEXT		: INLINECHAR+								: join
+
+	### pattern format definition
+		## character expression (inside user specific grammar)
+			# codedChar: TAB LF CR backslash ] ' "
+			codedChar		: CODEDCHAR CHARCODE						: liftValue codeToChar
+			# hex/dec ordinal code
+			hexChar			: HEXCHAR HEXDIGIT HEXDIGIT					: join hexToChar
+			decChar			: DECCHAR DECDIGIT DECDIGIT DECDIGIT		: join decToChar
+			# literal: safe char only
+			litChar			: SAFECHAR
+			charExpr		: codedChar / hexChar / decChar / litChar
+			ranj			: charExpr RANJ charExpr					: ranjToCharset
+		## item: group, klass, word, char, named pattern
+			# @@@ group recursion here @@@
+			namedPattern	: IDENTIFIER
+			char			: CHAR charExpr CHAR						: liftValue charCode
+			charExprs		: charExpr+									: join
+			word			: WORD charExprs WORD						: liftValue wordCode
+			klassItem		: ranj / EXCLUSION / KLASSSEP / charExpr
+			klass			: LCLAS klassItem+ RCLAS					: liftValue klassCode
+			item			: group / klass / word / char / namedPattern
+		## affix term: lookahead, option, repetition
+			# option
+			option			: item OPTION								: optionCode
+			# numbered repetition {n} or {m..n}
+			number			: INTEGER
+			numRanj			: number NUMRANJ number
+			numbering		: numRanj / number
+			numRepete		: LREPETE numbering RREPETE					: liftNode
+			# repetition -- with special case of string
+			repetSuffix		: numRepete / ZEROORMORE / ONEORMORE
+			stringRepetition: klass repetSuffix
+			genRepetition	: item repetSuffix
+			repetition		: stringRepetition / genRepetition			: repetitionCode
+			# lookahead
+			lookSuite		: repetition / option / item
+			lookahead		: (NEXT / NEXTNOT) lookSuite				: liftValue lookaheadCode
+			# item --> term
+			term			: lookahead / repetition / option / item
+		## format: term combination
+			# @@@  group>format>term>item>   circular recursion @@@
+			# combination
+			sequence		: term SEQUENCE term (SEQUENCE term)*		: intoList sequenceCode
+			choice			: term CHOICE term (CHOICE term)*			: intoList choiceCode
+			# format <--> group
+			format			: choice / sequence / term					: formatCode
+			group			: LGROUP format RGROUP						: @ liftNode
+		## transformation column -- including recursive tag
+			transformName	: IDENTIFIER
+			transformCalls	: transformName (TRANSFORMSEP transformName)*	: intoList
+			recursiveTag	: (RECURSIVE TRANSFORMSEP)?					: liftNode
+			transforms		: recursiveTag transformCalls				: extract
+		## pattern: patternName format transforms
+			patternName		: IDENTIFIER
+			formatCol		: COLUMN format								: liftNode
+			transformCol	: COLUMN transforms							: liftNode
+			optTransform	: transformCol?								: transformCode
+			pattern			: formatCol optTransform 					: patternCode
+			patternLine		: INDENT patternName pattern				: patternLineCode
+
+	### grammar structure
+		#== TODO: add line continuation (backslash EOL) ???
+		#== TODO: config parameter
+		## meta pattern for grammar sections
+			headerName 		: IDENTIFIER
+			header 			: BLANK LHEADER headerName RHEADER EOL		: join
+			notHeader		: !header
+		## skip line: blank, comment
+			blankLine		: INDENT EOL								: join
+			commentLine		: INDENT COMMENT INLINETEXT EOL				: join
+			skipLine		: blankLine / commentLine
+		## free introduction
+			introduction	: skipLine+
+			optIntroduction	: introduction?								: introductionCode
+		## title
+			titleID			: IDENTIFIER
+			title			: (INDENT titleID EOL)?						: join titleCode
+		## toolset: custom transform, validation, & preprocess functions
+			TOOLSET			: "toolset"
+			toolsetHeader	: INDENT LHEADER TOOLSET RHEADER EOL 		: join headerCode
+			toolsetLine		: notHeader INDENT INLINETEXT EOL			: join
+			toolsetBLock	: toolsetLine+
+			toolset			: toolsetHeader toolsetBLock				: extract
+			optToolset		: toolset?									: toolsetCode
+		## definition: sequence of patterns
+			DEFINITION		: "definition"
+			definitionHeader: INDENT LHEADER DEFINITION RHEADER EOL 	: join headerCode
+			definitionLine	: patternLine / skipLine
+			definitionBLock	: definitionLine+
+			definition		: definitionHeader definitionBLock			: extract definitionCode
+		## whole grammar:
+			# introduction & title & toolset & definition
+			# where introduction & toolset are optional
+			grammar	: optIntroduction title optToolset definition		: grammarCode
+
+
+

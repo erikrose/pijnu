@@ -21,33 +21,30 @@ along with PIJNU: see the file called 'GPL'.
 If not, see <http://www.gnu.org/licenses/>.
 '''
 
-"""
-<definition>
-SEP			: ' '
-DOT			: '.'
-digit		: [0..9]
-integer		: digit+
-real		: integer DOT integer?
-number		: real / integer
-numbers		: number (SEP number)*
 
-"""
+from pijnu.library import *
 
-from pijnu import *
+testingParser = Parser()
+state = testingParser.state
 
-### title: numbers ###
-###   <toolset>
-def doAddition(node):
-	(n1,n2) = (node[0].value,node[1].value)
-	node.value = int(n1) + int(n2)
-
+### title: testing ###
 ###   <definition>
-PLUS = Char('+')(drop)
-digit = Klass(format='[0..9]', charset='0123456789')
-integer = Repetition(digit, numMin=1,numMax=False, format='digit+')(join)
-addition = Sequence([integer, PLUS, integer])(doAddition)
+# recursive pattern(s)
+# codes
+# patterns
+# top pattern
+AorBorC = Klass('ABC', expression = '[ABC]', name='AorBorC')
 
-additionParser = Parser(vars(), 'addition', 'addition', 'None')
+testingParser._recordPatterns(vars())
+testingParser._setTopPattern("AorBorC")
+testingParser.grammarTitle = "testing"
+testingParser.filename = "testingParser.py"
 
-s = "22+333"
-print additionParser.match(s)
+# ===================================================================
+
+AorBorC.test('A$')
+AorBorC.test('X$')
+
+test_dict = AorBorC.testSuiteDict(['A$','B$','C$','X$','0$'])
+AorBorC.testSuite(test_dict)
+

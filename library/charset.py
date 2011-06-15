@@ -1,32 +1,33 @@
-# coding: utf8
+# -*- coding: utf8 -*-
 
+'''
+© 2009 Denis Derman (former developer) <denis.spir@gmail.com>
+© 2011 Peter Potrowl (current developer) <peter017@gmail.com>
 
-''' © copyright 2009 Denis Derman
-	contact: denis <dot> spir <at> free <dot> fr
-	
-    This file is part of PIJNU.
-	
-    PIJNU is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-	
-    PIJNU is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-	
-    You should have received a copy of the GNU General Public License
-    along with PIJNU: see the file called 'GPL'.
-    If not, see <http://www.gnu.org/licenses/>.
-	'''
+This file is part of PIJNU.
+
+PIJNU is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+PIJNU is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with PIJNU: see the file called 'GPL'.
+If not, see <http://www.gnu.org/licenses/>.
+'''
+
 '''	character klass parsing & expansion to produce a character set
-	
+
 	Note:
 		This is used only for a "manual" klass pattern in python code.
 		Klass expression charset are produced using step-by-step
 		transformation of char formats, ranges, and whole klass.
-	
+
 	format
 	similar to regex [...] charset
 	differences intended for legibility:
@@ -35,28 +36,28 @@
 		* no leading negation code '!'
 		* instead trailing exclusion using '!!'
 			[a..z  A..Z  !!kqKQ]
-	
+
 	Note:
 		As it is nonsense to include twice the same character in a charset,
 		the use of double characters as special codes is safe,
 		and avoids useless escaping of ' ', '.', & '!'.
-	
+
 	valid character formats by default:
 		* literal 'safe' char: no \, TAB, NL, CR, ', ", ]
 		* hex ordinal: '\x2f'  -- 2 hex digits
 		* dec ordinal: '\047'  -- 3 dec digits
 		* python-like code: \t \n \r \\ \] \' \"
-	
+
 	range expression:
 		<char>..<char>
 		* <char> can be any of the above character formats
 		* If the second char's ordinal is less than the first one's,
 		  the expansion returns an empty set (no exception).
-	
+
 	use of double space as visual separator:
 		"a..e  1..9"		--> "abcde123456879_ "
 		"abc  _  +-*/"		--> "abc_+- */"
-	
+
 	char klass expression in python code:
 		pattern = Klass(".........")
 		* Klass automatically calls charset() when not produced
@@ -77,7 +78,7 @@
 		* You can of course call charset() manually to build charsets.
 		  In this case, you can pass both the expression and the charset:
 		  Klass(expression, charset)
-	'''
+'''
 
 
 
@@ -155,7 +156,8 @@ def codesToChars(expression):
 	expression = expression.replace("\\\"",'"')
 	expression = expression.replace("\\]",']')
 	return expression
-# exclusion 
+
+# exclusion
 def exclusionSet(inset, exset):
 	for c in exset:
 		inset = inset.replace(c,'')
@@ -166,16 +168,17 @@ EXCLUSION = "!!"
 SPACE2 = "  "
 def charset(expression):
 	### cleaning phase:
-	#	~ double space separator are erased
+	#	~ double space separators are erased
 	#	~ nesting brackets are dropped
 	#	~ replace python-like code: \t \n \r \\, plus \] \' \"
 	expression = expression.replace(SPACE2,"")
 	if len(expression)>2 and expression[0]=="[" and expression[-1]=="]":
 		expression = expression[1:-1]
 	expression = codesToChars(expression)
+
 	### processing phase
-	# if expression contains EXCLUSION, split it
-	# and production included and excluded charsets
+	# if expression contains EXCLUSION code '!!', split it
+	# and produce both included and excluded charsets
 	#   [included!!excluded]
 	# then remove excluded characters
 	if EXCLUSION in expression:
@@ -230,7 +233,7 @@ def test():	# causes error at the end
 	# '3'
 	expression = r"""3..3  3..2  3..1"""
 	trial(expression)
-	
+
 	# exclusion
 	# 'abcdefghijlmnoprstuvwxyzAZ123456789'
 	expression = r"""[a..z  A..Z  0..9  !!kq  B..Y  0]"""

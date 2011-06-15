@@ -1,49 +1,51 @@
-# coding: utf8
+# -*- coding: utf8 -*-
 
+'''
+© 2009 Denis Derman (former developer) <denis.spir@gmail.com>
+© 2011 Peter Potrowl (current developer) <peter017@gmail.com>
 
-''' © copyright 2009 Denis Derman
-	contact: denis <dot> spir <at> free <dot> fr
-	
-    This file is part of PIJNU.
-	
-    PIJNU is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-	
-    PIJNU is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-	
-    You should have received a copy of the GNU General Public License
-    along with PIJNU: see the file called 'GPL'.
-    If not, see <http://www.gnu.org/licenses/>.
-	'''
-'''	s o u r c e   p r e p r o c e s s i n g
+This file is part of PIJNU.
 
-	Preprocessing funcs are called
-	in the preprocess part of a text grammar.
-	
-	Preprocess is particuliarly useful
-	to clarify the following grammar.
-	
-	Here is just a set of useful functions:
-		~ NormalizeSeps such as whitespace or end of line,
-		  or any other kind of 'annoying' variable item,
-		  to a single form (eg ' ' or '\x0a').
-		  -- also useful to prepare SKIP_SEP mode (see config)
-		~ WrapIndentedStructure replaces indented structure with
-		  wrapping delimiters (eg '{' & '}' on their own line)
-		  -- then blocks are easily parsed
-		~ DeleteComments using start & end comment markers
-		  (eg '#' & '\n').
-		~ DeleteBlankLines
-		~ ...
-	
-	You can write your own custom transformations as needed:
-	include them in the <toolset> section of the grammar.
-	'''
+PIJNU is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+PIJNU is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with PIJNU: see the file called 'GPL'.
+If not, see <http://www.gnu.org/licenses/>.
+'''
+
+'''
+Source preprocessing
+
+Preprocessing funcs are called
+in the preprocess part of a text grammar.
+
+Preprocess is particuliarly useful
+to clarify the following grammar.
+
+Here is just a set of useful functions:
+  ~ NormalizeSeps: items such as whitespace or end of line,
+    or any other kind of 'annoying' variable item,
+    are normalized to a single form (eg ' ' or '\x0a').
+    -- also useful to prepare SKIP_SEP mode (see config)
+  ~ WrapIndentedStructure: replaces indented structure with
+    wrapping block delimiters (eg '{' & '}' on their own line)
+    -- then blocks are easily parsed
+  ~ DeleteComments: removes comments from source,
+    using start & end comment markers (often '#' & '\n').
+  ~ DeleteBlankLines
+  ~ ...
+
+You can write your own custom transformations as needed:
+include them in the <toolset> section of the grammar.
+'''
 
 # import export
 from pijnu.tools import *
@@ -51,6 +53,10 @@ from pattern import *
 __all__ = [	"NormalizeSeps",
 			"WrapIndentedStructure","IndentWrappedStructure",
 			]
+
+
+### character constants
+(EOL,TAB,SPC,EOF) = ('\n','\t',' ',chr(3))
 
 ### separator normalization
 def NormalizeSeps(source, format, standard=" "):
@@ -74,7 +80,7 @@ def howManyAtStart(text, string):
 	return n
 def WrapIndentedStructure(	source,
 							INDENT=None,
-							open="{\n", close="}\n",
+							OPEN="{\n", CLOSE="}\n",
 							keepIndent=False ):
 	''' Transform indented to wrapped structure.
 		~ Indentation must be consistent!
@@ -82,7 +88,6 @@ def WrapIndentedStructure(	source,
 		~ Indentation can be kept: nicer & more legible result
 		  but needs to be coped with during parsing.
 		~ Blank lines are ignored. '''
-	(EOL,TAB,SPC,EOF) = ('\n','\t',' ',chr(3))
 	level = 0		# current indent level
 	# add artificial EOFile marker
 	source += EOF + EOL
@@ -113,31 +118,31 @@ def WrapIndentedStructure(	source,
 			else:
 				result += EOL
 			continue
-		# get difference of indentation
+		# get offset: difference of indentation
 		if line == EOF: line = ''
-		diff = howManyAtStart(line, INDENT) - level
+		offset = howManyAtStart(line, INDENT) - level
 		# case no indent level change
-		if diff == 0:
+		if offset == 0:
 			result += line + EOL
 		# case indent level increment (+1)
-		elif diff == 1:
+		elif offset == 1:
 			level += 1
-			openmark = (INDENT*level + open) if keepIndent else open
+			open_mark = (INDENT*level + OPEN) if keepIndent else OPEN
 			if not keepIndent:
 				line = line[length:]
-			result += openmark + line + EOL
+			result += open_mark + line + EOL
 		# case indent level decrement (<= current level)
-		elif diff < 0:
-			diff = -diff
-			level -= diff
+		elif offset < 0:
+			offset = -offset
+			level -= offset
 			if keepIndent:
-				closemarks = ""
-				for n in range(level+diff, level, -1):
-					closemarks += (n*INDENT + close)
+				close_marks = ""
+				for n in range(level+offset, level, -1):
+					close_marks += (n*INDENT + CLOSE)
 			else:
-				closemarks = diff * close
-				line = line[diff*length:]
-			result += closemarks + line + EOL
+				close_marks = offset * CLOSE
+				line = line[offset*length:]
+			result += close_marks + line + EOL
 		else:
 			# case indent level inconsistency (increment > 1)
 			message = "Inconsistent indentation at line #%s" \
