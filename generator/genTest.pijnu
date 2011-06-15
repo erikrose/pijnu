@@ -1,0 +1,68 @@
+# a mini test grammar for the generator
+
+# © 2009 Denis Derman (former developer) <denis.spir@gmail.com>
+# © 2011 Peter Potrowl (current developer) <peter017@gmail.com>
+
+# This file is part of PIJNU.
+
+# PIJNU is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# PIJNU is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with PIJNU: see the file called 'GPL'.
+# If not, see <http://www.gnu.org/licenses/>.
+
+genTest
+
+<toolset>
+def doMult(node):
+	(a,b) = node
+	node.value = a.value * b.value
+
+def doAdd(node):
+	(a,b) = node
+	node.value = a.value + b.value
+
+def formatResult(node):
+	node.value = "%.3f" % node.value
+<definition>
+# constants
+	SPACE		: ' '							: drop
+	SPACING		: SPACE*						: drop
+	DOT			: "."
+	MINUS		: "-"
+	PLUS		: "+"							: drop
+	ADD			: PLUS
+	_ADD_		: SPACING ADD SPACING			: drop
+	MULT		: "*"
+	_MULT_		: SPACING MULT SPACING			: drop
+	DIGIT		: [0..9]
+	SIGN		: PLUS / MINUS
+	SIGN_		: SIGN SPACING
+	LPAREN		: "("							: drop
+	RPAREN		: ")"							: drop
+
+# operand
+	digits		: DIGIT+
+	integer		: SIGN_? digits
+	real		: integer (DOT digits)?
+	number		: real / integer				: join toFloat
+	group		: LPAREN operation RPAREN		: liftNode
+	operand 	: group / number
+
+# operation
+	mult		: operand _MULT_ (mult/operand)	: @ doMult
+	addOp		: mult / operand
+	add			: addOp _ADD_  (add/addOp)		: @ doAdd
+	operation	: add / mult					: @
+	foo			: ("a"/"b"){3}
+	bar			: [1..9]{3}
+	baz			: '1'{3}
+	result		: operation / operand			: formatResult

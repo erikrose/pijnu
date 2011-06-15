@@ -1,27 +1,29 @@
-# coding: utf8
+# -*- coding: utf8 -*-
 
+'''
+© 2009 Denis Derman (former developer) <denis.spir@gmail.com>
+© 2011 Peter Potrowl (current developer) <peter017@gmail.com>
 
-''' © copyright 2009 Denis Derman
-	contact: denis <dot> spir <at> free <dot> fr
-	
-    This file is part of PIJNU.
-	
-    PIJNU is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-	
-    PIJNU is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-	
-    You should have received a copy of the GNU General Public License
-    along with PIJNU: see the file called 'GPL'.
-    If not, see <http://www.gnu.org/licenses/>.
-	'''
-'''		p i j n u   m e t a - p a r s e r
-	'''
+This file is part of PIJNU.
+
+PIJNU is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+PIJNU is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with PIJNU: see the file called 'GPL'.
+If not, see <http://www.gnu.org/licenses/>.
+'''
+
+'''
+Pijnu meta-parser
+'''
 
 """# pijnu meta grammar
 	grammar
@@ -216,7 +218,7 @@ def wordCode(node):
 	# example: 	"xyz"
 	# --> 		word:"xyz"
 	# --> 		Word("xyz")
-	# 
+	#
 	# use repr() to avoid trouble of control characters
 	word = repr(node.value)
 	# new node value
@@ -243,7 +245,7 @@ def klassCode(node):
 """
 
 from pijnu.library import *
-from pijnuToolset import *
+from pijnuActions import *
 # pijnu meta grammar
 # title: grammar
 group = Recursive()
@@ -269,7 +271,7 @@ if True:	### tokens
 	LPAREN = Char('(')
 	RPAREN = Char(')')
 	ESC = Char('\\')
-	
+
 	## codes
 	# character expression: char, word, ranj, class
 	# (no need to drop escape as code will be transformed anyway)
@@ -302,7 +304,7 @@ if True:	### tokens
 	# various
 	COMMENT = Char('#')
 	RECURSIVE = Char('@')
-	
+
 	## character classes
 	DECDIGIT = Klass(r'0..9')
 	HEXDIGIT = Klass(r'0..9abcdefABCDEF')
@@ -342,7 +344,7 @@ if True:	### pattern definition
 	klass = Sequence([LKLASS, OneOrMore(klassItem), RKLASS])(join, liftValue, klassToCharset, klassCode)
 	#@@ group recursion here @@
 	item = Choice([group, klass, word, char, name])
-	
+
 	## affix term: lookahead, option, repetition
 	# option
 	option = Sequence([item, OPTION])(optionCode)
@@ -364,7 +366,7 @@ if True:	### pattern definition
 	lookahead = Choice([nextNot, next])(liftValue, lookaheadCode)
 	# item --> term
 	term = Choice([lookahead, repetition, option, item])
-	
+
 	## format: term combination
 	# group>format>term>item>   circular recursion
 	# combination
@@ -396,19 +398,19 @@ if True:	### grammar structure
 	### FIXME: there could be 2 ':' between format and transform
 	pattern			= Sequence([format, OPTCOLUMN, optTransform])(patternCode)
 	patternDef 	= Sequence([DROPSPACING, patName, COLUMN, pattern, EOL])(patternDefCode)
-	
+
 	## section/block/header/body meta pattern
 	LHEADER			= Char('<')
 	RHEADER			= Char('>')
 	headerName 		= copy(IDENTIFIER)
 	header 			= Sequence([INDENT, LHEADER, headerName, RHEADER, EOL])(join)
 	notHeader		= NextNot(header)
-	
+
 	## skip line: blank, comment
 	blankLine 		= Sequence([INDENT, EOL])(liftValue)
 	commentLine 	= Sequence([INDENT, COMMENT, INLINETEXT, EOL])(join)
 	skipLine 		= Choice([blankLine, commentLine])
-	
+
 	## introduction with title & free comment
 	titleID			= copy(IDENTIFIER)
 	title	 		= Sequence([DROPINDENT, titleID, EOL])(join,titleCode)
