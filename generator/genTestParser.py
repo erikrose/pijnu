@@ -1,5 +1,25 @@
 """ genTest
 <definition>
+
+''' © copyright 2009 Denis Derman
+	contact: denis <dot> spir <at> free <dot> fr
+	
+    This file is part of PIJNU.
+	
+    PIJNU is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+	
+    PIJNU is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+	
+    You should have received a copy of the GNU General Public License
+    along with PIJNU: see the file called 'GPL'.
+    If not, see <http://www.gnu.org/licenses/>.
+	'''
 # constants
 	SPACE		: ' '							: drop
 	SPACING		: SPACE*						: drop
@@ -15,7 +35,7 @@
 	SIGN_		: SIGN SPACING
 	LPAREN		: "("							: drop
 	RPAREN		: ")"							: drop
-
+	
 # operand
 	digits		: DIGIT+
 	integer		: SIGN_? digits
@@ -50,6 +70,9 @@ state = genTestParser.state
 ### title: genTest ###
 
 
+			   # foobar
+
+
 ###   <toolset>
 def doMult(node):
 	(a,b) = node
@@ -58,7 +81,7 @@ def doMult(node):
 def doAdd(node):
 	(a,b) = node
 	node.value = a.value + b.value
-
+	
 def formatResult(node):
 	node.value = "%.3f" % node.value
 
@@ -82,7 +105,7 @@ SIGN = Choice([PLUS, MINUS], expression='PLUS / MINUS',name='SIGN')
 SIGN_ = Sequence([SIGN, SPACING], expression='SIGN SPACING',name='SIGN_')
 LPAREN = Word('(', expression='"("',name='LPAREN')(drop)
 RPAREN = Word(')', expression='")"',name='RPAREN')(drop)
-
+	
 # operand
 digits = Repetition(DIGIT, numMin=1,numMax=False, expression='DIGIT+',name='digits')
 integer = Sequence([Option(SIGN_, expression='SIGN_?'), digits], expression='SIGN_? digits',name='integer')

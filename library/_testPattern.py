@@ -1,30 +1,29 @@
-# -*- coding: utf8 -*-
+# coding: utf8
 
+
+''' © copyright 2009 Denis Derman
+	contact: denis <dot> spir <at> free <dot> fr
+	
+    This file is part of PIJNU.
+	
+    PIJNU is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+	
+    PIJNU is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+	
+    You should have received a copy of the GNU General Public License
+    along with PIJNU: see the file called 'GPL'.
+    If not, see <http://www.gnu.org/licenses/>.
+	'''
 '''
-© 2009 Denis Derman (former developer) <denis.spir@gmail.com>
-© 2011 Peter Potrowl (current developer) <peter017@gmail.com>
-
-This file is part of PIJNU.
-
-PIJNU is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-PIJNU is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with PIJNU: see the file called 'GPL'.
-If not, see <http://www.gnu.org/licenses/>.
-'''
-
-'''
-pattern testing
-  -- in separate module to avoid parser circular import
-'''
+	pattern testing
+	-- in separate module to avoid parser circular import
+	'''
 
 from parser import Parser	# for testing
 from pattern import *
@@ -190,7 +189,7 @@ def testRecursion():
 	x 		= Recursive()
 	ll		= Sequence([l, x])(join)
 	x 		**= Choice([ll, l])
-
+	
 	# y : '(' y ')' / 'a'  -- y::(parenY / l)
 	(lparen,rparen)	= (Char('(')(drop),Char(')')(drop))
 	y 		= Recursive()
@@ -205,7 +204,7 @@ def testRecursion():
 	grp 	= Recursive()
 	oper	= Sequence([ Choice([grp, n]), op, Choice([grp, n]) ])(extract)
 	grp 	**= Sequence([lparen, oper, rparen])
-
+	
 	# mult	: (group / n) '*' (group / mult / n)
 	# add	: (mult / n) '*' (add / mult / n)
 	# group	: '(' (add / mult) ')'
@@ -218,7 +217,7 @@ def testRecursion():
 	add 	**= Sequence([ Choice([mult, n]), plus, Choice([add, mult, n]) ])
 	group 	**= Sequence([lparen, add, rparen])
 	formula = Choice([add, mult, n])
-
+	
 	parser = Parser(vars())
 
 	# testing
@@ -238,7 +237,7 @@ def testFindReplace():
 	print num.findAll(text)
 	print "\n=== replace [0..9]+ with '#' in\n   %s\n" % text
 	print num.replace(text,"#")
-
+	
 def test():
 	testCombine()
 	print RULER

@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 
 
 ''' © copyright 2009 Denis Derman
@@ -20,21 +20,4 @@
     along with PIJNU: see the file called 'GPL'.
     If not, see <http://www.gnu.org/licenses/>.
 	'''
-'''		p i j n u   g e n e r a t o r
-	
-	client interface to export useful names
-	
-	structure:
-	
-	pijnu
-		generator <-- library
-			generator (write parser -- yield pattern)
-			pijnuparser.py (pijnu meta parser)
-			pijnu.pijnu (pijnu meta grammar)
-			pijnuToolset.py (specific transformations)
-	
 
-	'''
-
-### import/export
-from generator import makeParser, getPattern
