@@ -1,25 +1,28 @@
+# -*- coding: utf8 -*-
+
+'''
+© 2009 Denis Derman (former developer) <denis.spir@gmail.com>
+© 2011 Peter Potrowl (current developer) <peter017@gmail.com>
+
+This file is part of PIJNU.
+
+PIJNU is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+PIJNU is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with PIJNU: see the file called 'GPL'.
+If not, see <http://www.gnu.org/licenses/>.
+'''
+
 """
 <definition>
-
-''' © copyright 2009 Denis Derman
-	contact: denis <dot> spir <at> free <dot> fr
-	
-    This file is part of PIJNU.
-	
-    PIJNU is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-	
-    PIJNU is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-	
-    You should have received a copy of the GNU General Public License
-    along with PIJNU: see the file called 'GPL'.
-    If not, see <http://www.gnu.org/licenses/>.
-	'''
 # coding
 	LBRACKET	: '['										: drop
 	RBRACKET	: '\]'										: drop
@@ -51,21 +54,21 @@ from pijnu import *
 ### title: klasses ###
 ###   <toolset>
 def charFromEsc(node):
-	node.value = node[0].value
+    node.value = node[0].value
 def charFromDec(node):
-	ord = int(node.value)
-	node.value = chr(ord)
+    ord = int(node.value)
+    node.value = chr(ord)
 def charFromHex(node):
-	ord = int(node.value, 16)
-	node.value = chr(ord)
+    ord = int(node.value, 16)
+    node.value = chr(ord)
 def charsetFromRanj(node):
-	(n1,n2) = (ord(node[0].value),ord(node[1].value))
-	chars = [chr(n) for n in range(n1, n2+1)]
-	node.value = ''.join(chars)
+    (n1,n2) = (ord(node[0].value),ord(node[1].value))
+    chars = [chr(n) for n in range(n1, n2+1)]
+    node.value = ''.join(chars)
 def excludedCharset(node):
-	(inCharset,exCharset) = (node[0].value,node[1].value)
-	chars = [c for c in inCharset if c not in exCharset]
-	node.value = ''.join(chars)
+    (inCharset,exCharset) = (node[0].value,node[1].value)
+    chars = [c for c in inCharset if c not in exCharset]
+    node.value = ''.join(chars)
 
 ###   <definition>
 # coding
@@ -93,4 +96,3 @@ exclCharset = Sequence([charset, EXCLUSION, charset], format='charset EXCLUSION 
 klass = Sequence([LBRACKET, Choice([exclCharset, charset], format='exclCharset / charset'), RBRACKET], format='LBRACKET (exclCharset / charset) RBRACKET')(liftValue)
 
 klassesParser = Parser(vars(), 'klass', 'klasses', 'None')
-
