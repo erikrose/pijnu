@@ -21,31 +21,29 @@ along with PIJNU: see the file called 'GPL'.
 If not, see <http://www.gnu.org/licenses/>.
 '''
 
-'''
-w1 : "foo"
-w2 : "bar"
-ch : w1 / w2
-'''
 
 from pijnu.library import *
 
-testParserParser = Parser()
-state = testParserParser.state
+testingParser = Parser()
+state = testingParser.state
 
-
-
-
-### title: testParser ###
-
-
+### title: testing ###
 ###   <definition>
-w1 = Word('foo', expression='"foo"',name='w1')
-w2 = Word('bar', expression='"bar"',name='w2')
-ch = Choice([w1, w2], expression='w1 / w2',name='ch')
+# recursive pattern(s)
+# codes
+# patterns
+# top pattern
+AorBorC = Klass('ABC', expression='[ABC]', name='AorBorC')
 
+testingParser._recordPatterns(vars())
+testingParser._setTopPattern("AorBorC")
+testingParser.grammarTitle = "testing"
+testingParser.filename = "testingParser.py"
 
+# ===================================================================
 
-testParserParser._recordPatterns(vars())
-testParserParser._setTopPattern("ch")
-testParserParser.grammarTitle = "testParser"
-testParserParser.filename = "testParserParser.py"
+AorBorC.test('A$')
+AorBorC.test('X$')
+
+test_dict = AorBorC.testSuiteDict(['A$', 'B$', 'C$', 'X$', '0$'])
+AorBorC.testSuite(test_dict)

@@ -37,7 +37,7 @@ If parserFileName is not given, the parser is written into
 ### import/export
 from pijnu.generator import makeParser
 from sys import argv as arguments
-from pijnu.tools import *
+from library.tools import *
 
 
 def do():

@@ -31,7 +31,7 @@ Parser generator.
 '''
 
 ### import/export
-from pijnu.tools import fileText, writeFile
+from pijnu.library.tools import fileText, writeFile
 # pattern types for getPattern
 from pijnu.library.pattern import *
 

@@ -1,7 +1,7 @@
 # coding:utf8
 
 '''		p i j n u   p a r s e r   m a t c h   a c t i o n s
-	
+
 	A set of match actions to change node values.
 	Used by pijnu's meta parser to write user parser code.
 '''
@@ -9,7 +9,7 @@
 
 ### import/export
 # Note: export all names to pijnuParser
-from pijnu.tools import *
+from pijnu.library.tools import *
 from pijnu.library.node import Node, Nodes
 
 ### character format
@@ -29,12 +29,12 @@ def codeToChar(node):
 	# '\\t'  --> '\t'
 	# '\\]'  --> ']'
 	node.value = CODE_MAP[node.value]
-def hexToChar(node):	
+def hexToChar(node):
 	''' Change hexadecimal ordinal format to character  '''
 	# '\x61' --> 'a'
 	ord = int(node[2:], 16)
 	node.value = chr(ord)
-def decToChar(node):	
+def decToChar(node):
 	''' Change decimal ordinal format to character  '''
 	# '\097' --> 'a'
 	ord = int(node[1:])
@@ -60,7 +60,7 @@ def wordCode(node):
 	# example: 	"xyz"
 	# --> 		word:"xyz"
 	# --> 		Word('xyz')
-	# 
+	#
 	# original format expr for pattern output
 	expr = repr(node.snippet)
 	# ~ use repr() to avoid trouble of control characters
@@ -104,7 +104,7 @@ def klassToCharset(node):
 		message = (	"Class expr cannot hold EXCLUSION code '!!'"
 					" more than once.\n   %s" % klass)
 		raise ValueError(message)
-	
+
 def klassCode(node):
 	''' Change klass node value to Klass() expr. '''
 	# example: 	[a..e  0..9  _ -  !!d0]
@@ -267,7 +267,7 @@ def transformCode(node):
 		# -- new node value
 		if len(transforms) == 0:
 			node.value = ""
-		else:		
+		else:
 			transformNames = [tr.value for tr in transforms]
 			transformList = ", ".join(transformNames)
 			node.value = "(%s)" % transformList
@@ -311,7 +311,7 @@ def patternDefCode(node):
 	(format,transform) = (pattern.format,pattern.transform)
 	# trick syntax for recursive pattern
 	BIND = "**=" if node.isRecursive else "="
-	
+
 	### set node value
 	# special case of cloned pattern
 	if pattern.isName:
@@ -421,7 +421,7 @@ def headerCode(node):
 	# new node value
 	HEADERHEAD = "###   "
 	node.value = HEADERHEAD + node.value
-	
+
 ### whole grammar
 def grammarCode(node):
 	''' Change grammar node value to whole grammar code. '''
@@ -439,7 +439,7 @@ def grammarCode(node):
 	# new node value
 	node.value = introduction.value + toolset.value + definition.value
 
-# debug func used to display info on a failing pattern	
+# debug func used to display info on a failing pattern
 def check(node):
 	pass
 

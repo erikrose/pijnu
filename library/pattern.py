@@ -80,13 +80,12 @@ Patterns
 
 
 ### import/export
-from pijnu.tools import *
+from tools import *
 
 from node import *
 from error import *
 from charset import charset as toCharset
 from time import time   # for stats
-
 
 
 # object used to collect statistics on match checks
@@ -106,11 +105,13 @@ class Stats(object):
         self.successes = 0
         self.branches = 0
         self.leaves = 0
+
     def time(self):
         if self.start_time is None or self.stop_time is None:
             return ""
         runtime = self.stop_time - self.start_time
         return "\nrun time: %.3f" % runtime
+
     def __str__(self):
         return ("\n=== parsing statistics:\n"
                 "match trials:          %s\n"
@@ -131,7 +132,6 @@ class Stats(object):
                 self.time()
                 )
         )
-
 
 
 ### super type ###
@@ -197,6 +197,7 @@ class Pattern(object):
 
         # match
         return self._memoCheck(source, 0)
+
     def matchTest(self, source):
         ''' Match in test mode. '''
         # match
@@ -205,6 +206,7 @@ class Pattern(object):
         except PijnuError, e:
             print (e)
             return None
+
     def parse(self, source):
         ''' Match whole of source text.
             Return result tree/node or raise MatchFailure error.
@@ -226,6 +228,7 @@ class Pattern(object):
 
         # case matching stopped before end of source text
         raise IncompleteParse(self, source, pos, result)
+
     def parseTest(self, source):
         ''' Parse in test mode.
         '''
@@ -234,6 +237,7 @@ class Pattern(object):
         except (MatchFailure,EndOfText,IncompleteParse), e:
             print (e)
             return None
+
     def findFirst(self, source):
         ''' Find & return first match for pattern in source.
             ~ case no match found, return None
@@ -250,6 +254,7 @@ class Pattern(object):
             except PijnuError:
                 pos += 1
         return None
+
     def findAll(self, source):
         ''' Find & return all matches for pattern in source ~ findAll.
             ~ Case none is found, result is empty sequence.
@@ -275,6 +280,7 @@ class Pattern(object):
             except PijnuError:
                 pos += 1
         return nodes
+
     def replace(self, source, value):
         ''' Find all matches for pattern in source
             & replace them with given value.
@@ -292,6 +298,7 @@ class Pattern(object):
             pos = node.end
         result += source[pos:]
         return result
+
     # memoization reset
     def _resetMemo(self, done=None):
         ''' Reset memoization of all patterns involved, recursively.
@@ -331,7 +338,6 @@ class Pattern(object):
         # if ever...
         return result
 
-
     def testSuite(self, test_dict, method_name="parse", verbose=False):
         ''' Perform a test suite by asserting equality
             of expected and actual parse results.
@@ -365,7 +371,6 @@ class Pattern(object):
         # print summary
         print "\n*** Test suite: %s passed; %s failed ***" % (pass_count, error_count)
         return error_count
-
 
     def testSuiteMultiline(self, sources, results, method_name="parse", verbose=False):
         ''' Perform a test suite by asserting equality
@@ -403,7 +408,6 @@ class Pattern(object):
         # print summary
         print "\n*** Test suite: %s passed; %s failed ***" % (pass_count, error_count)
         return error_count
-
 
     def testSuiteDict(self, sources, method_name="parse", multiline = False):
         ''' Return & print a test dict for testSuite.
@@ -444,7 +448,6 @@ class Pattern(object):
                 print "    \"%s\": \"%r\"" % (source, result.value)
             print "}"
         return d
-
 
     ### match check
     def _memoCheck(self, source, pos):
@@ -491,12 +494,14 @@ class Pattern(object):
             else:
                 Pattern.stats.matchFailures += 1
         raise result
+
     def _realCheck(self, source, pos):
         ''' Real match check when no memo available at current pos.
             ~ Outcome is either node or error.
             ~ New position in source is a node attribute.
         '''
         raise NotImplementedError
+
     def _message(self):
         ''' error message in case of failure
             * actually defined on each pattern type
@@ -524,6 +529,7 @@ class Pattern(object):
             if self.format is None: self.format = self._format()
             return self.format
         return self.name
+
     def _format(self):
         ''' normalized output format --defined on each pattern type
             ~ defined on first request for pattern output
@@ -531,6 +537,7 @@ class Pattern(object):
             ~ patterns from code get a computed normal form
         '''
         raise NotImplementedError
+
     def _fullFormat(self):
         ''' extensive output format, recursively including
             every sub pattern format (instead of names)
@@ -539,6 +546,7 @@ class Pattern(object):
         '''
         if self.format is None: self.format = self._format()
         return self.format
+
     def __str__(self):
         ''' standard output string "name:format"
         '''
@@ -548,11 +556,13 @@ class Pattern(object):
         if Pattern.FULL_OUTPUT:
             return "%s:%s" %(self.name,self._fullFormat())
         return "%s:%s" %(self.name,self.format)
+
     def _formatRepr(self):
         ''' representation of pattern creation syntax used by __repr__
             * defined on each pattern type
         '''
         raise NotImplementedError
+
     def __repr__(self):
         ''' representation of pattern creation syntax
             Example:
@@ -570,6 +580,7 @@ class Pattern(object):
             naming = ', name="%s"' %self.name
         return '%s(%s%s)' %(typ,args,naming)
 
+
 ### literal word #############################
 class Word(Pattern):
     ''' literal word pattern :   "word"
@@ -580,6 +591,7 @@ class Word(Pattern):
         self.length = len(word)
         # define common attributes
         Pattern.__init__(self, expression, name)
+
     def _realCheck(self, source, pos):
         ''' Check pattern match at position pos in source string.
             ~ successful if word is found at pos. '''
@@ -593,16 +605,20 @@ class Word(Pattern):
             return Node(self, self.word, startPos,end_pos,source)
         # case failure
         return MatchFailure(self, source, pos)
+
     def _message(self):
         ''' error message in case of failure '''
         return """Cannot find word: "%s".""" % self.word
+
     def _format(self):
         ''' normal output format
         '''
         return '"%s"' % self.word
+
     def _formatRepr(self):
         ''' representation of pattern creation used by __repr__ '''
         return '"%s"' % self.word
+
 
 ### combinations #############################
 class Choice(Pattern):
@@ -634,6 +650,7 @@ class Choice(Pattern):
         # else a Choice
         self = Pattern.__new__(cls, patterns, expression, name)
         return self
+
     def __init__(self, patterns, expression=None, name=None):
         ''' Define name, patterns, memo
         '''
@@ -641,6 +658,7 @@ class Choice(Pattern):
         # define common attributes
         Pattern.__init__(self, expression, name)
         self.wrapped = self.patterns    # --> _resetMemo
+
     def _realCheck(self, source, pos):
         ''' Check pattern match at position pos in source string.
             ~ successful iff one of sub patterns matches. '''
@@ -665,22 +683,26 @@ class Choice(Pattern):
         # case overall failure
         self.sub_errors = sub_errors
         return MatchFailure(self, source, pos)
+
     def _message(self):
         ''' error message in case of failure '''
         overall_message = ("Cannot match any pattern in choice.\n"
                         "(wrapped pattern errors below)")
         wrapped_message = '\n'.join(str(e) for e in self.sub_errors)
         return "%s\n%s" %(overall_message, wrapped_message)
+
     def _format(self):
         ''' normal output format
         '''
         pat_names = [p._shortForm() for p in self.patterns]
         return "(%s)" % ' / '.join(pat_names)
+
     def _fullFormat(self):
         ''' extensive output format
         '''
         pat_formats = [p._fullFormat() for p in self.patterns]
         return "(%s)" % ' / '.join(pat_formats)
+
 
 class Sequence(Pattern):
     ''' ordered sequence pattern :   a b
@@ -691,6 +713,7 @@ class Sequence(Pattern):
         # define common attributes
         Pattern.__init__(self, expression, name)
         self.wrapped = self.patterns    # --> _resetMemo
+
     def _realCheck(self, source, pos):
         ''' Check pattern match in source string.
             ~ successful iff all patterns match in sequence. '''
@@ -711,22 +734,26 @@ class Sequence(Pattern):
                 return MatchFailure(self, source, pos)
         # case overall success
         return Node(self, childNodes, startPos,pos,source)
+
     def _message(self):
         ''' error message in case of failure '''
         overall_message = ("Cannot match all patterns in sequence.\n"
                         "(wrapped pattern error below)")
         return "%s\n%s" % (overall_message,self.sub_error)
+
     def _format(self):
         ''' normal output format
         '''
         names = [p.name for p in self.patterns]
         pat_short_forms = [p._shortForm() for p in self.patterns]
         return "(%s)" % '  '.join(pat_short_forms)
+
     def _fullFormat(self):
         ''' extensive output format
         '''
         pat_formats = [p._fullFormat() for p in self.patterns]
         return "(%s)" % '  '.join(pat_formats)
+
 
 ### "possibilities" ##########################
 class Option(Pattern):
@@ -739,6 +766,7 @@ class Option(Pattern):
         # define common attributes
         Pattern.__init__(self, expression, name)
         self.wrapped = [self.pattern]   # --> _resetMemo
+
     def _realCheck(self, source, pos):
         ''' Check pattern match in source string.
             ~ successful in all cases
@@ -755,17 +783,21 @@ class Option(Pattern):
         # case failure: return nil node, pos does not move
         except PijnuError, e:
             return Node(self, Node.NIL, pos,pos,source)
+
     def _message(self):
         ''' ### option cannot fail! '''
         pass
+
     def _format(self):
         ''' normal output format
         '''
         return '%s?' % self.pattern._shortForm()
+
     def _fullFormat(self):
         ''' extensive output format
         '''
         return '(%s)?' % self.pattern._fullFormat()
+
 
 class Next(Pattern):
     ''' positive lookahead pattern :   &p
@@ -776,6 +808,7 @@ class Next(Pattern):
         # define common attributes
         Pattern.__init__(self, expression, name)
         self.wrapped = [self.pattern]   # --> _resetMemo
+
     def _realCheck(self, source, pos):
         ''' Check pattern match at position pos in source string.
             ~ successful if wrapped pattern succeeds. '''
@@ -789,20 +822,24 @@ class Next(Pattern):
             e.wrap = True
             self.sub_error = e
             return MatchFailure(self, source, pos)
+
     def _message(self):
         ''' error message in case of failure '''
         overall_message = ( "Cannot match pattern:   %s.\n"
                             "(wrapped pattern error below)"
                             % self.pattern)
         return "%s\n%s" % (overall_message,self.sub_error)
+
     def _format(self):
         ''' normal output format
         '''
         return '&%s' % self.pattern._shortForm()
+
     def _fullFormat(self):
         ''' extensive output format
         '''
         return '&(%s)' % self.pattern._fullFormat()
+
 
 class NextNot(Pattern):
     ''' negative lookahead pattern :   !p
@@ -813,6 +850,7 @@ class NextNot(Pattern):
         # define common attributes
         Pattern.__init__(self, expression, name)
         self.wrapped = [self.pattern]   # --> _resetMemo
+
     def _realCheck(self, source, pos):
         ''' Check pattern match in source string.
             ~ successful if wrapped pattern fails. '''
@@ -825,19 +863,23 @@ class NextNot(Pattern):
         # -- return nil node, keep pos unchanged
         except PijnuError, e:
             return Node(self, Node.NIL, pos,pos,source)
+
     def _message(self):
         ''' error message in case of failure '''
         # sub-pattern failure --> success:
         # ==> there is no sub-pattern error for NextNot!
         return "Found match for pattern:   %s." % self.pattern
+
     def _format(self):
         ''' normal output format
         '''
         return '!%s' % self.pattern._shortForm()
+
     def _fullFormat(self):
         ''' extensive output format
         '''
         return '!(%s)' % self.pattern._fullFormat()
+
 
 ### repetitions ##############################
 ### TODO: "Until" '>' stop condition
@@ -850,6 +892,7 @@ class ZeroOrMore(Pattern):
         # define common attributes
         Pattern.__init__(self, expression, name)
         self.wrapped = [self.pattern]   # --> _resetMemo
+
     def _realCheck(self, source, pos):
         ''' Check pattern match in source string.
             ~ successful in all case
@@ -869,13 +912,16 @@ class ZeroOrMore(Pattern):
             except PijnuError, e:
                 break
         return Node(self, childNodes, startPos,pos,source)
+
     def _message(self):
         ''' ### zeroOrMore cannot fail! '''
         pass
+
     def _format(self):
         ''' normal output format
         '''
         return '%s*' % self.pattern._shortForm()
+
 
 class OneOrMore(Pattern):
     ''' one-or-more repetition pattern : p+
@@ -886,6 +932,7 @@ class OneOrMore(Pattern):
         # define common attributes
         Pattern.__init__(self, expression, name)
         self.wrapped = [self.pattern]   # --> _resetMemo
+
     def _realCheck(self, source, pos):
         ''' Check pattern match in source string.
             ~ successful if wrapped pattern succeeds at least once
@@ -914,16 +961,19 @@ class OneOrMore(Pattern):
             except PijnuError, e:
                 break
         return Node(self, childNodes, startPos,pos,source)
+
     def _message(self):
         ''' error message in case of failure '''
         overall_message = ( "Cannot match at all pattern:   %s.\n"
                             "(wrapped pattern error below)"
                             % self.pattern)
         return "%s\n%s" % (overall_message,self.sub_error)
+
     def _format(self):
         ''' normal output format
         '''
         return '%s+' % self.pattern._shortForm()
+
 
 class Repetition(Pattern):
     ''' general repetition pattern
@@ -975,6 +1025,7 @@ class Repetition(Pattern):
         # define common attributes
         Pattern.__init__(self, expression, name)
         self.wrapped = [pattern]    # --> _resetMemo
+
     def _realCheck(self, source, pos):
         ''' Check pattern match in source string.
             ~ successful if wrapped pattern succeeds at least numMin time(s)
@@ -1006,12 +1057,14 @@ class Repetition(Pattern):
             return MatchFailure(self, source, pos)
         # result
         return Node(self, childNodes, startPos,pos,source)
+
     def _message(self):
         ''' error message in case of failure '''
         overall_message = ( "Cannot match at least %s time(s) pattern %s.\n"
                             "(wrapped pattern error below)"
                             % (self.numMin, self.pattern) )
         return "%s\n%s" % (overall_message,self.sub_error)
+
     def _format(self):
         ''' normal output format according to numMin/numMax case
         '''
@@ -1030,6 +1083,7 @@ class Repetition(Pattern):
             repete = "{%s..%s}" % (self.numMin,self.numMax)
         return '%s%s' % (self.pattern._shortForm(),repete)
 
+
 ### character specific ##############
 class Char(Pattern):
     ''' single char pattern :   'c'
@@ -1039,6 +1093,7 @@ class Char(Pattern):
         self.char = char
         # define common attributes
         Pattern.__init__(self, expression, name)
+
     def _realCheck(self, source, pos):
         ''' Check pattern match at position pos in source string.
             ~ successful if char is found at pos. '''
@@ -1050,14 +1105,17 @@ class Char(Pattern):
             return Node(self, self.char, pos,pos+1,source)
         # case failure
         return MatchFailure(self, source, pos)
+
     def _message(self):
         ''' error message in case of failure '''
         return "Cannot find char: %s." % repr(self.char)
+
     def _format(self):
         ''' normal output format
         '''
         # rather return repr
         return repr(self.char)
+
 
 class Klass(Pattern):
     ''' character class pattern :   [klass]
@@ -1087,6 +1145,7 @@ class Klass(Pattern):
         expression = Klass._cleanRepr(expression)
         # define common attributes
         Pattern.__init__(self, expression, name)
+
     def _realCheck(self, source, pos):
         ''' Check pattern match at position pos in source string.
             ~ successful if current char is in charset. '''
@@ -1099,17 +1158,20 @@ class Klass(Pattern):
             return Node(self, char, pos,pos+1,source)
         # case failure
         return MatchFailure(self, source, pos)
+
     def _format(self):
         ''' normal output format
         '''
         # already computed by _cleanRepr(expression)
         return self.format
+
     def _message(self):
         ''' error message in case of failure '''
         return "Cannot find any char member of class %s." % self
     # tool func for clean text output
     control_chars = set( chr(n) for n in (range(0, 32) + range(127, 160)) )
     control_char_map = dict( (c, repr(c)[1:-1]) for c in control_chars )
+
     @staticmethod
     def _cleanRepr(text):
         ''' text with control chars replaced by repr() equivalent '''
@@ -1119,6 +1181,7 @@ class Klass(Pattern):
                 char = ErrorLocation.control_char_map[char]
             chars += char
         return chars
+
 
 class String(Pattern):
     ''' character string pattern
@@ -1155,6 +1218,7 @@ class String(Pattern):
         Pattern.__init__(self, expression, name)
         # Note: no wrapped pattern (for _reset_memo),
         # cause we check the klass's charset directly.
+
     def _realCheck(self, source, pos):
         ''' Check pattern match at position pos in source string.
             ~ successful if at least numMin number of
@@ -1189,10 +1253,12 @@ class String(Pattern):
             node = Node(self, Node.NIL, pos,pos,source)
         node = Node(self, chars, startPos,pos,source)
         return node
+
     def _message(self):
         ''' error message in case of failure '''
         return "Cannot find minimal number of characters (%s)\n" \
                 "members of class %s." % (self.numMin,self.klass)
+
     def _format(self):
         ''' normal output format
         '''
@@ -1212,6 +1278,7 @@ class String(Pattern):
         # global output
         return "%s%s" % (self.klass._format(),repetition)
 
+
 ### "special" patterns ######################
 class AnyChar(Pattern):
     ''' any char pattern :   .
@@ -1221,12 +1288,14 @@ class AnyChar(Pattern):
           (intended to be the class of valid characters)
     '''
     KLASS = None
+
     def __init__(self, expression=None, name=None):
         ''' Define name, memo.'''
         if AnyChar.KLASS is not None:
             self.wrapped = [AnyChar.KLASS]  # --> _resetMemo
         # define common attributes
         Pattern.__init__(self, expression, name)
+
     def _realCheck(self, source, pos):
         ''' Check pattern match at position pos in source string.
             ~ if KLASS is None: successful if not at end of source text.
@@ -1247,14 +1316,18 @@ class AnyChar(Pattern):
             message = ( "AnyChar.KLASS should be a character class pattern.\n"
                         "Found %s:%s" %(KLASS.__class__.__name__,KLASS) )
             raise TypeError(message)
+
     def _message(self):
         ''' error message in case of failure '''
         return "Cannot find char: %s." % self.char
+
     def _format(self):
         ''' normal output format
         '''
         return "."
+
 ANY_CHAR = AnyChar()
+
 
 class Recursive(Pattern):
     ''' recursive pattern wrapper
@@ -1286,6 +1359,7 @@ class Recursive(Pattern):
         group   == Sequence( Char('('), Choice(add, mult), Char(')') )
     '''
     DEFAULT_FORMAT = "<recursive>"
+
     def __init__(self, expression=None, name=None):
         ''' A recursive pattern will actually be defined later
             using '**=' -- see __ipow__() method.
@@ -1293,6 +1367,7 @@ class Recursive(Pattern):
         Pattern.__init__(self, expression, name)
         self.isRecursive = True
         self.isDefined = False
+
     def __ipow__(self, pattern):
         ''' Record real definition of the pattern.
             ~ just a syntactic trick to cope with recursivity
@@ -1309,6 +1384,7 @@ class Recursive(Pattern):
         # Return self !!!
         self.isDefined = True
         return self
+
     def _realCheck(self, source, pos):
         ''' Check pattern match at position pos in source string.
             ~ successful if wrapped pattern is successful. '''
@@ -1322,9 +1398,11 @@ class Recursive(Pattern):
         except PijnuError, e:
             e.pattern = self
             return e
+
     def _message(self):
         ''' error message in case of failure '''
         return "match failure for Recursive pattern %s" % self
+
     def _format(self):
         ''' normal output format
             -- actually wrapped pattern format
@@ -1334,12 +1412,14 @@ class Recursive(Pattern):
         if self.pattern.format is None:
             self.pattern.format = self.pattern._format()
         return self.pattern.format
+
     def _shortForm(self):
         ''' short output form for recursive pattern:
             always fixed string to avoid infinite recursion '''
         if self.name == Pattern.DEFAULT_NAME:
             return Recursive.DEFAULT_FORMAT
         return self.name
+
 
 class Clone(Pattern):
     ''' cloned pattern, to allow different match actions
@@ -1355,7 +1435,5 @@ class Clone(Pattern):
         return self
 
 
-
 ### test #####################################
 # in module testPattern
-

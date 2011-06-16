@@ -27,7 +27,7 @@ Tool prog to insert a notice in selected files of recursively walked dirs
 See more info in variable 'info' below.
 '''
 
-from pijnu.tools import fileText, fileNames
+from library.tools import fileText, fileNames
 import sys, os
 end = sys.exit
 

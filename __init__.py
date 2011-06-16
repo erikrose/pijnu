@@ -42,7 +42,6 @@ pijnu
 '''
 
 ### import/export
-import tools                    # custom python tools
 import library                  # pijnu internal library
 import generator                # parser & pattern generation
 

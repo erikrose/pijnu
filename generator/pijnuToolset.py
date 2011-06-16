@@ -3,25 +3,25 @@
 
 ''' © copyright 2009 Denis Derman
 	contact: denis <dot> spir <at> free <dot> fr
-	
+
     This file is part of PIJNU.
-	
+
     PIJNU is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-	
+
     PIJNU is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-	
+
     You should have received a copy of the GNU General Public License
     along with PIJNU: see the file called 'GPL'.
     If not, see <http://www.gnu.org/licenses/>.
 	'''
 '''		p i j n u   m e t a   t r a n s fo r m s
-	
+
 	A set of tranformation functions to change node values.
 	Used by pijnu's meta parser to write user parser code.
 	'''
@@ -29,7 +29,7 @@
 
 ### import/export
 # Note: export all names to pijnuParser
-from pijnu.tools import *
+from pijnu.library.tools import *
 from pijnu.library.node import Node, Nodes
 
 ### character format
@@ -49,12 +49,12 @@ def codeToChar(node):
 	# '\\t'  --> '\t'
 	# '\\]'  --> ']'
 	node.value = CODE_MAP[node.value]
-def hexToChar(node):	
+def hexToChar(node):
 	''' Change hexadecimal ordinal format to character  '''
 	# '\x61' --> 'a'
 	ord = int(node[2:], 16)
 	node.value = chr(ord)
-def decToChar(node):	
+def decToChar(node):
 	''' Change decimal ordinal format to character  '''
 	# '\097' --> 'a'
 	ord = int(node[1:])
@@ -80,7 +80,7 @@ def wordCode(node):
 	# example: 	"xyz"
 	# --> 		word:"xyz"
 	# --> 		Word('xyz')
-	# 
+	#
 	# original format expr for pattern output
 	expr = repr(node.snippet)
 	# ~ use repr() to avoid trouble of control characters
@@ -124,7 +124,7 @@ def klassToCharset(node):
 		message = (	"Class expr cannot hold EXCLUSION code '!!'"
 					" more than once.\n   %s" % klass)
 		raise ValueError(message)
-	
+
 def klassCode(node):
 	''' Change klass node value to Klass() expr. '''
 	# example: 	[a..e  0..9  _ -  !!d0]
@@ -287,7 +287,7 @@ def transformCode(node):
 		# -- new node value
 		if len(transforms) == 0:
 			node.value = ""
-		else:		
+		else:
 			transformNames = [tr.value for tr in transforms]
 			transformList = ", ".join(transformNames)
 			node.value = "(%s)" % transformList
@@ -331,7 +331,7 @@ def patternDefCode(node):
 	(format,transform) = (pattern.format,pattern.transform)
 	# trick syntax for recursive pattern
 	BIND = "**=" if node.isRecursive else "="
-	
+
 	### set node value
 	# special case of cloned pattern
 	if pattern.isName:
@@ -441,7 +441,7 @@ def headerCode(node):
 	# new node value
 	HEADERHEAD = "###   "
 	node.value = HEADERHEAD + node.value
-	
+
 ### whole grammar
 def grammarCode(node):
 	''' Change grammar node value to whole grammar code. '''
@@ -459,7 +459,7 @@ def grammarCode(node):
 	# new node value
 	node.value = introduction.value + toolset.value + definition.value
 
-# debug func used to display info on a failing pattern	
+# debug func used to display info on a failing pattern
 def check(node):
 	pass
 
