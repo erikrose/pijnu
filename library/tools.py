@@ -143,6 +143,10 @@ class Seq(list):
     def __repr__(self):
         itemText = "  ".join(repr(item) for item in self)
         return "[%s]" % itemText
+    
+    def __unicode__(self):
+        itemText = u"  ".join(unicode(item) for item in self)
+        return "[%s]" % itemText
 
     def __str__(self):
         itemText = "  ".join(str(item) for item in self)

@@ -122,7 +122,7 @@ def klassCode(node):
 	charset = repr(node.value)
 	# new node value
 	# !!! format comes first here !!!
-	node.value = "Klass(%s, expression=%s)" % (charset,expr)
+	node.value = "Klass(u%s, expression=%s)" % (charset, expr)
 
 ### term with affix: option, repetition, lookahead
 def optionCode(node):
@@ -151,16 +151,16 @@ def repetSuffixCode(node):
 	repetTyp = node.tag
 	# case sign: '*' or '+'
 	if repetTyp == "ZEROORMORE":
-		node.value = "numMin=False,numMax=False"
+		node.value = "numMin=False, numMax=False"
 	elif repetTyp == "ONEORMORE":
-		node.value = "numMin=1,numMax=False"
+		node.value = "numMin=1, numMax=False"
 	# case numbering
 	elif repetTyp == "number":
 		n = node.value
-		node.value = "numMin=%s,numMax=%s" % (n,n)
+		node.value = "numMin=%s, numMax=%s" % (n,n)
 	elif repetTyp == "numRanj":
 		(m,n) = (node[0].value,node[1].value)
-		node.value = "numMin=%s,numMax=%s" % (m,n)
+		node.value = "numMin=%s, numMax=%s" % (m,n)
 def repetitionCode(node):
 	''' Change string node value to expr of repetition.
 		* When the base pattern is a klass, or a simple char,
@@ -316,14 +316,14 @@ def patternDefCode(node):
 	# special case of cloned pattern
 	if pattern.isName:
 		print "name pattern format", format
-		node.value = 	"%s %s Clone(%s, expression='%s',name='%s')%s" \
+		node.value = 	"%s %s Clone(%s, expression='%s', name='%s')%s" \
 						% (name, BIND, format, format,name, transform)
 	# ordinary case
 	else:
 		# ~ pattern def node holds pattern & transform, plus recursive flag
 		# ~ format & transform are stored by pattern node
 		format_ = format[:-1]			# to insert naming in arg list
-		node.value = 	"%s %s %s,name='%s')%s" \
+		node.value = 	"%s %s %s, name='%s')%s" \
 						% (name, BIND, format_,name, transform)
 
 ### "skip" lines

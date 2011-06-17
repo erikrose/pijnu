@@ -354,20 +354,20 @@ class Pattern(object):
         # perform matches and assert
         error_count = 0
         pass_count = 0
-        for (source,result) in test_dict.items():
+        for (source, result) in test_dict.items():
             try:
                 r = method(source).value
             except PijnuError:
                 r = None
             try:
-                assert str(r) == result
+                assert unicode(r) == result
                 if verbose:
                     print "%s --> %s" %(source, result)
                 pass_count += 1
             except AssertionError:
                 error_count += 1
-                print (    "*** error ***\n   %s --> %s\n   expected: %s"
-                        %(source, r, result) )
+                print ("*** error ***\n   %s --> %s\n   expected: %s"
+                       % (source, unicode(r), result))
         # print summary
         print "\n*** Test suite: %s passed; %s failed ***" % (pass_count, error_count)
         return error_count
@@ -1154,8 +1154,12 @@ class Klass(Pattern):
             return EndOfText(self, source, pos)
         # case success
         char = source[pos]
-        if char in self.charset:
-            return Node(self, char, pos,pos+1,source)
+        
+        # This way, Unicode characters, previously treated as bytes,
+        # will pass; this is just a basic hack; a whole class allowing
+        # ranges of characters would be far better.
+        if char in self.charset or ord(char) > 255:
+            return Node(self, char, pos, pos+1, source)
         # case failure
         return MatchFailure(self, source, pos)
 

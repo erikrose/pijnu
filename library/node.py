@@ -243,6 +243,11 @@ class Node(object):
             message = "Node %s\nis a leaf node without child nodes." % self
             raise TypeError(message)
 
+    def __unicode__(self):
+        if isinstance(self.value, Nodes):
+            return "%s:%s" % (self.tag, unicode(self.value))
+        return "%s:'%s'" % (self.tag, unicode(self.value))
+
     ### output
     def __repr__(self):
         ''' output format "type:value"
@@ -545,7 +550,12 @@ def join(node):
     if node.kind is Node.LEAF:
         return
     toLeaves(node)
-    childTexts = [str(child.value) for child in node.value]
+    childTexts = []
+    for child in node.value:
+        if isinstance(child.value, unicode):
+            childTexts.append(unicode(child.value))
+        else:
+            childTexts.append(str(child.value))
     node.value = ''.join(childTexts)
 
 
