@@ -240,7 +240,7 @@ class Parser(object):
             raise AttributeError(message)
         return self.topPattern.testSuite(test_dict, method_name, silent)
 
-    def testSuiteDict(self, sources, method_name="parse"):
+    def testSuiteDict(self, sources, method_name="parse", multiline=False):
         ''' Return & print a test dict for testSuite.
             In other words, create regression test suite data.
             Note that this should be done only once!
@@ -252,7 +252,30 @@ class Parser(object):
                         "Either first define a top pattern\n" \
                         "or invoke one of its pattern attributes."
             raise AttributeError(message)
-        return self.topPattern.testSuiteDict(sources, method_name)
+        return self.topPattern.testSuiteDict(sources, method_name, multiline)
+
+    def testSuiteMultiline(self, sources, results, method_name="parse", verbose=False):
+        ''' Perform a test suite by asserting equality
+            of expected and actual parse results.
+            This is intended to perform a regression test:
+            the method checks that modifications do not introduce bugs,
+            once a parser or pattern has been proved to run fine.
+
+            ~ test_dict holds {source:result} pairs
+            ~ result is in fact the string repr of a node *value*
+            ~ None result means expected match failure.
+
+            At best, use method testSuiteDict to first get a test_dict.
+            Note that unlike test, the default method is parse.
+            This method takes a list of source patterns and a list of
+            expected result, to allow multiline patterns and results.
+        '''
+        if not self.canMatch:
+            message = "This parser cannot match directly (yet).\n" \
+                        "Either first define a top pattern\n" \
+                        "or invoke one of its pattern attributes."
+            raise AttributeError(message)
+        return self.topPattern.testSuiteMultiline(sources, results, method_name, verbose)
 
     ### output
     def __str__(self):
