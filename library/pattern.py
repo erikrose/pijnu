@@ -399,11 +399,11 @@ class Pattern(object):
             try:
                 assert r.treeView() == result
                 if verbose:
-                    print "%r --> %r" %(source, result)
+                    print "Source:\n%s\nResult:\n%s" %(source, result)
                 pass_count += 1
             except AssertionError:
                 error_count += 1
-                print (    "*** error ***\n   %s --> \n*%s*\n\n   expected: \n*%s*\n"
+                print (    "*** error ***\nSource:\n%s\nResult:\n%s\n\nExpected:\n%s\n"
                         %(source, r.treeView(), result) )
         # print summary
         print "\n*** Test suite: %s passed; %s failed ***" % (pass_count, error_count)
