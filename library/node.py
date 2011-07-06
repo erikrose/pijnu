@@ -126,6 +126,9 @@ class Nil(object):
     def __repr__(self):
         return "Ø"
 
+    def __unicode__(self):
+        return u"Ø"
+
 
 ### Node
 class Node(object):
@@ -249,6 +252,12 @@ class Node(object):
         return "%s:'%s'" % (self.tag, unicode(self.value))
 
     ### output
+    def leaf(self):
+        if isinstance(self.value, Nodes):
+            value = " ".join(item.leaf() for item in self.value)
+            return value
+        return self.value
+
     def __repr__(self):
         ''' output format "type:value"
         '''
@@ -295,6 +304,18 @@ class Node(object):
         # whole tree
         return "%s%s" % (format, value)
 
+    def leaves(self):
+        '''Recursively returns the leaves of the node tree'''
+        if self.kind is Node.LEAF:
+            value = self.value
+        else:
+            value = ""
+            for child in self.value:
+                if isinstance(child, Node):
+                    value += "%s" % (child.leaves())
+                else:
+                    value += "%s" % child
+        return "%s" % (value)
 
 ################## match actions ####################
 ### debug
