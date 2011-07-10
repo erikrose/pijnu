@@ -268,8 +268,10 @@ def transformCode(node):
 		if len(transforms) == 0:
 			node.value = ""
 		else:
+			def dispatchExpression(name):
+				return "toolset['%s']" % name
 			transformNames = [tr.value for tr in transforms]
-			transformList = ", ".join(transformNames)
+			transformList = ", ".join(map(dispatchExpression, transformNames))
 			node.value = "(%s)" % transformList
 
 def patternCode(node):
@@ -367,8 +369,31 @@ def toolsetCode(node):
 		node.tag = "toolset"
 		node.value = ""
 	else:
-		toolsetLines = '\n'.join(line.value for line in node.value)
-		node.value = "%s\n\n" % toolsetLines
+		toolsetLines = '\n    '.join(line.value for line in node.value)
+		node.value = '''
+def merged_toolset():
+    """Merge anything passed in with the hard-coded toolset and then pijnu's default actions.
+
+    ...in that order of precedence.
+
+    """
+%s
+
+    # Get default actions from pijnu.library:
+    actions = globals().copy()
+
+    # Overlay actions from the grammar:
+    hard_coded_actions = locals().copy()
+    del hard_coded_actions['toolset']  # This creeps in from the outer scope because we reference it.
+    del hard_coded_actions['actions']
+    actions.update(hard_coded_actions)
+
+    # And overlay any passed-in actions:
+    actions.update(toolset)
+    return actions
+
+toolset = merged_toolset()\n\n''' % toolsetLines
+
 ### TODO: elaborate preprocess section
 def preprocessCode(node):
 	''' Change preprocess node value to preprocess section in code.

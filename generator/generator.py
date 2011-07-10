@@ -80,18 +80,6 @@ def getPattern(format):
 
 #
 ### parser generator
-if True:    # parser code constants
-    PARSER_START_TEXT   = """
-    from pijnu import *
-    from transform import *
-
-    """
-    PARSER_END_TEXT = """
-
-    ### parser generation ###
-    parser = Parser(vars())
-    parser.name
-    """
 def makeParser(grammarText, feedback=False):
     ''' Write parser code file. '''
     ''' example:
@@ -112,30 +100,38 @@ def makeParser(grammarText, feedback=False):
     # major code sections
     grammarTitle = tree.title
     definition = tree.definition
-    definitionCopy = '""" %s\n%s\n"""\n' %(grammarTitle,tree.definition)
-    importPijnuLib = "\n\n\nfrom pijnu.library import *\n"
-    grammarCode = tree.value
     # parser object definition
     parserName = "%sParser" % grammarTitle
     topPatternName = tree.topPatternName
-    parserCreation = "\n%s = Parser()\n" % parserName
-    stateDef = 'state = %s.state\n\n\n\n' % parserName
     filename = "%s.py" % parserName
-    parserSpec = (  '\n\n\n\n'
-                    '%s._recordPatterns(vars())\n'
-                    '%s._setTopPattern("%s")\n'
-                    '%s.grammarTitle = "%s"\n'
-                    '%s.filename = "%s"\n'
-                %   (   parserName,
-                        parserName,topPatternName,
-                        parserName,grammarTitle,
-                        parserName,filename,
-                    )
-                )
-    # whole code
-    code =  (   definitionCopy + importPijnuLib +
-                parserCreation + stateDef +
-                grammarCode + parserSpec )
+
+    code = ('''%(definitionCopy)s
+from pijnu.library import *
+
+
+def make_parser(toolset=None):
+    if toolset is None:
+        toolset = {}
+
+    parser = Parser()
+    state = parser.state
+
+%(grammarCode)s
+
+    symbols = locals().copy()
+    symbols.update(toolset)
+    parser._recordPatterns(symbols)
+    parser._setTopPattern("%(topPatternName)s")
+    parser.grammarTitle = "%(grammarTitle)s"
+    parser.filename = "%(filename)s"
+
+    return parser\n''' %
+    dict(definitionCopy='""" %s\n%s\n"""\n' % (grammarTitle, tree.definition),
+         parserName=parserName,
+         topPatternName=topPatternName,
+         grammarTitle=grammarTitle,
+         filename=filename,
+         grammarCode='\n    '.join(tree.value.splitlines())))
 
     ### write parser module --possible feedback on stdout
     print "... writing file ...\n"
@@ -146,8 +142,7 @@ def makeParser(grammarText, feedback=False):
     ### return parser object --if ever needed
     modulename = filename[:-3]
     module = __import__(modulename)
-    parser = getattr(module, parserName)
-    return parser
+    return module.make_parser()
 #
 #
 #
