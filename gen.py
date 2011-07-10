@@ -58,7 +58,7 @@ def do():
         parserFile = file(arguments[2], 'w')
         makeParser(grammar, parserFile)
     except Exception:
-        makeeParser(grammar)
+        makeParser(grammar)
 
 if __name__ == "__main__":
     do()

@@ -45,7 +45,7 @@ from error import PijnuError
 
 class State(object):
     ''' a container for state data
-        ~ Used to tansform parser into a kind of state machine
+        ~ Used to transform parser into a kind of state machine
           able to cope with contextual match validation.
         ~ Data should be set on the state object as attributes.
     '''
@@ -96,7 +96,7 @@ class Parser(object):
               either at init or when ready to collect patterns.
             ~ From text grammar, top pattern and title are automatic.
             ~ fileName is here only to allow several variants of a parser
-              -- but it's better practice to differenciate grammar names.
+              -- but it's better practice to differentiate grammar names.
         '''
         # Record patterns as attributes automatically
         # if caller scope is passed at init.

@@ -165,7 +165,7 @@ class Pattern(object):
     ### creation
     def __init__(self, expression=None, name=None):
         ''' Common pattern intialization:
-            format, name, transformations, mmemoïzation
+            format, name, transformations, memoïzation
         '''
         # format:
         # ~ from text grammar: format is taken from original expression

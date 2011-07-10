@@ -33,7 +33,7 @@ pijnu
         generator (write parser -- yield pattern)
         pijnuparser.py (pijnu meta parser)
         pijnu.pijnu (pijnu meta grammar)
-        pijnuToolset.py (specific transformations)
+        pijnuActions.py (specific transformations)
 '''
 
 ### import/export
