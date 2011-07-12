@@ -46,7 +46,9 @@ grammar = file("genTest.pijnu").read()
 #~ parser.test(source,"findAll")
 #~ end()
 
-parser = makeParser(grammar)
+makeParser(grammar)
+from genTestParser import make_parser
+parser = make_parser()
 
 # test it
 sources = """\

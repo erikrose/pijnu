@@ -1,51 +1,48 @@
-# -*- coding: utf8 -*-
+""" testParser
+<definition>
+    w1 : "foo"
+    w2 : "bar"
+    ch : w1 / w2
 
-'''
-© 2009 Denis Derman (former developer) <denis.spir@gmail.com>
-© 2011 Peter Potrowl (current developer) <peter017@gmail.com>
-
-This file is part of PIJNU.
-
-PIJNU is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-PIJNU is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with PIJNU: see the file called 'GPL'.
-If not, see <http://www.gnu.org/licenses/>.
-'''
-
-'''
-w1 : "foo"
-w2 : "bar"
-ch : w1 / w2
-'''
+"""
 
 from pijnu.library import *
 
-testParserParser = Parser()
-state = testParserParser.state
+
+def make_parser(actions=None):
+    """Return a parser.
+
+    The parser's toolset functions are (optionally) augmented (or overridden)
+    by a map of additional ones passed in.
+
+    """
+    if actions is None:
+        actions = {}
+
+    # Start off with the imported pijnu library functions:
+    toolset = globals().copy()
+
+    parser = Parser()
+    state = parser.state
 
 
+    ### title: testParser ###
+    
+    
+    
+    
+    toolset.update(actions)
+    
+    ###   <definition>
+    w1 = Word('foo', expression='"foo"', name='w1')
+    w2 = Word('bar', expression='"bar"', name='w2')
+    ch = Choice([w1, w2], expression='w1 / w2', name='ch')
 
+    symbols = locals().copy()
+    symbols.update(actions)
+    parser._recordPatterns(symbols)
+    parser._setTopPattern("ch")
+    parser.grammarTitle = "testParser"
+    parser.filename = "testParserParser.py"
 
-### title: testParser ###
-
-
-###   <definition>
-w1 = Word('foo', expression='"foo"',name='w1')
-w2 = Word('bar', expression='"bar"',name='w2')
-ch = Choice([w1, w2], expression='w1 / w2',name='ch')
-
-
-
-testParserParser._recordPatterns(vars())
-testParserParser._setTopPattern("ch")
-testParserParser.grammarTitle = "testParser"
-testParserParser.filename = "testParserParser.py"
+    return parser

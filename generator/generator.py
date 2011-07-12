@@ -151,7 +151,7 @@ def make_parser(actions=None):
     ### return parser object --if ever needed
     modulename = filename[:-3]
     module = __import__(modulename)
-    return module.make_parser()
+
 #
 #
 #
