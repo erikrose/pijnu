@@ -310,8 +310,7 @@ testParser
     w2 : "bar"
     ch : w1 / w2
 """
-    makeParser(grammar)
-    from testParserParser import make_parser
+    make_parser = makeParser(grammar)
     parser = make_parser()
     print "parser       :", parser
     print "top pattern  :", parser.topPattern
