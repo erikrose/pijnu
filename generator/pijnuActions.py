@@ -367,32 +367,21 @@ def toolsetCode(node):
 	# new node value
 	if node.value == Node.NIL:
 		node.tag = "toolset"
-		node.value = ""
+		node.value = '''
+
+'''
 	else:
 		toolsetLines = '\n    '.join(line.value for line in node.value)
-		node.value = '''
-def merged_toolset():
-    """Merge anything passed in with the hard-coded toolset and then pijnu's default actions.
-
-    ...in that order of precedence.
-
-    """
+		node.value = \
+'''def toolset_from_grammar():
+    """Return a map of toolset functions hard-coded into the grammar."""
 %s
 
-    # Get default actions from pijnu.library:
-    actions = globals().copy()
+    return locals().copy()
 
-    # Overlay actions from the grammar:
-    hard_coded_actions = locals().copy()
-    del hard_coded_actions['toolset']  # This creeps in from the outer scope because we reference it.
-    del hard_coded_actions['actions']
-    actions.update(hard_coded_actions)
+toolset.update(toolset_from_grammar())\n''' % toolsetLines
 
-    # And overlay any passed-in actions:
-    actions.update(toolset)
-    return actions
-
-toolset = merged_toolset()\n\n''' % toolsetLines
+	node.value += 'toolset.update(actions)\n\n'
 
 ### TODO: elaborate preprocess section
 def preprocessCode(node):

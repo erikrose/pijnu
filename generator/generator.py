@@ -109,9 +109,18 @@ def makeParser(grammarText, feedback=False):
 from pijnu.library import *
 
 
-def make_parser(toolset=None):
-    if toolset is None:
-        toolset = {}
+def make_parser(actions=None):
+    """Return a parser.
+
+    The parser's toolset functions are (optionally) augmented (or overridden)
+    by a map of additional ones passed in.
+
+    """
+    if actions is None:
+        actions = {}
+
+    # Start off with the imported pijnu library functions:
+    toolset = globals().copy()
 
     parser = Parser()
     state = parser.state
@@ -119,7 +128,7 @@ def make_parser(toolset=None):
 %(grammarCode)s
 
     symbols = locals().copy()
-    symbols.update(toolset)
+    symbols.update(actions)
     parser._recordPatterns(symbols)
     parser._setTopPattern("%(topPatternName)s")
     parser.grammarTitle = "%(grammarTitle)s"
