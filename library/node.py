@@ -360,6 +360,9 @@ def liftValue(node):
         return
     if len(node) != 1:
         return
+    if isinstance(node[0], unicode):
+        node = node[0]
+        return
     node.value = node[0].value
 
 
