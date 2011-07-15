@@ -1,13 +1,13 @@
 from pijnu.tests import ParserTestCase
+from pijnu import makeParser
 
 
 class ToolsetTests(ParserTestCase):
     """Tests for custom transformation functions"""
 
     def test_custom_toolset(self):
-        """Make sure plugging in a custom quote-parsing postprocessor works."""
-        from pijnu import makeParser
-        numbersTransformGrammar = """\
+        """Make sure we can use a custom toolset inside the grammar."""
+        numbers_transform_grammar = """\
 test_custom_toolset_numbers_transform
 <toolset>
 def to_real(node):
@@ -22,19 +22,18 @@ def to_real(node):
     addedNum   : SEP number            : liftNode
     numbers    : number (addedNum)*    : extract
 """
-        make_parser = makeParser(numbersTransformGrammar)
+        make_parser = makeParser(numbers_transform_grammar)
         parser = make_parser()
         source = "1 3.141592 5"
         result = "[integer:'1.0'  real:'3.141592'  integer:'5.0']"
         self.assertEquals(unicode(parser.parseTest(source).value), result)
 
     def test_external_toolset(self):
-        """Make sure plugging in a custom quote-parsing postprocessor works."""
-        from pijnu import makeParser
+        """Make sure we can pass a custom toolset from the make_parser call."""
         def to_real(node):
             node.value = float(node.value)
 
-        numbersTransformGrammar = """\
+        numbers_transform_grammar = """\
 test_external_toolset_numbers_transform
 <definition>
     SEP        : ' '                   : drop
@@ -46,7 +45,7 @@ test_external_toolset_numbers_transform
     addedNum   : SEP number            : liftNode
     numbers    : number (addedNum)*    : extract
 """
-        make_parser = makeParser(numbersTransformGrammar)
+        make_parser = makeParser(numbers_transform_grammar)
         parser = make_parser({'to_real': to_real})
         source = "1 3.141592 5"
         result = "[integer:'1.0'  real:'3.141592'  integer:'5.0']"
