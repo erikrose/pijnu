@@ -25,7 +25,7 @@ If not, see <http://www.gnu.org/licenses/>.
 Simple test profiler -- just case needed
 '''
 
-from pijnu import writeParser
+from pijnu import makeParser
 
 
 def parseTest():
@@ -44,7 +44,7 @@ number		: real / integer			: toReal
 addedNum	: SEP number				: liftNode
 numbers		: number (addedNum)*		: extract
 """
-    writeParser(numbersTransformGrammar)
+    makeParser(numbersTransformGrammar)
 
 
 def profile(command, logFile):
@@ -60,5 +60,4 @@ def profile(command, logFile):
     ps.print_stats(11)
     print ruler
 
-from generator import test
-profile("test()", "testProfileStats")
+profile("parseTest()", "testProfileStats")

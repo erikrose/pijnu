@@ -1,0 +1,18 @@
+# a mini test grammar for the generator
+
+# © 2009 Denis Derman (former developer)
+# © 2011 Peter Potrowl (current developer)
+
+test_custom_toolset_numbers_transform
+<toolset>
+def to_real(node):
+    node.value = float(node.value)
+<definition>
+    SEP        : ' '                   : drop
+    DOT        : '.'
+    digit      : [0..9]
+    integer    : digit+                : join
+    real       : integer DOT integer?  : join
+    number     : real / integer        : to_real
+    addedNum   : SEP number            : liftNode
+    numbers    : number (addedNum)*    : extract
