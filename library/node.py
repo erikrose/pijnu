@@ -254,7 +254,7 @@ class Node(object):
     ### output
     def leaf(self):
         if isinstance(self.value, Nodes):
-            value = " ".join(item.leaf() for item in self.value)
+            value = ''.join(item.leaf() for item in self.value)
             return value
         return self.value
 
